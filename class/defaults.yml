@@ -3,3 +3,43 @@ parameters:
     =_metadata:
       multi_tenant: true
     namespace: syn-kgateway
+
+    gateway_api:
+      channel: experimental
+      version: v1.4.0
+
+    charts:
+      kgateway-crds:
+        source: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+        version: v2.2.2
+      kgateway:
+        source: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
+        version: v2.2.2
+
+    namespace_labels: {}
+    namespace_annotations: {}
+
+    # Configurable Gateway resources (cluster admin defines these)
+    gateways: {}
+
+    # Gateway API resources
+    reference_grants: {}
+
+    # kgateway-specific resources
+    gateway_parameters: {}
+    listener_policies: {}
+    backend_config_policies: {}
+    gateway_extensions: {}
+    traffic_policies: {}
+
+    # Aggregated RBAC for CRD visibility
+    rbac:
+      # ClusterRole aggregated to cluster-reader for Gateway API + kgateway CRDs
+      aggregated_cluster_reader: true
+
+    helm_values_crds: {}
+
+    helm_values:
+      controller:
+        extraEnv:
+          KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES: true

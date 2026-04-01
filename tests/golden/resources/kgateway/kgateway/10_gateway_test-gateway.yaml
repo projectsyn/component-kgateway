@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: test-gateway
+  namespace: syn-kgateway
+spec:
+  gatewayClassName: kgateway
+  infrastructure:
+    parametersRef:
+      group: gateway.kgateway.dev
+      kind: GatewayParameters
+      name: test-params
+  listeners:
+    - allowedRoutes:
+        namespaces:
+          from: All
+      name: http
+      port: 8080
+      protocol: HTTP

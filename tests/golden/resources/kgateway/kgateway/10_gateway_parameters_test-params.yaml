@@ -1,0 +1,9 @@
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: test-params
+  namespace: syn-kgateway
+spec:
+  kube:
+    deployment:
+      replicas: 2

@@ -1,0 +1,16 @@
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: test-traffic-policy
+  namespace: demo
+spec:
+  rateLimit:
+    local:
+      tokenBucket:
+        fillInterval: 1s
+        maxTokens: 100
+        tokensPerFill: 10
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: nginx-route
