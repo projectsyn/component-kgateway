@@ -1,0 +1,5 @@
+= kgateway
+
+kgateway is a Commodore component to manage kgateway.
+
+See the xref:references/parameters.adoc[parameters] reference for further details.
