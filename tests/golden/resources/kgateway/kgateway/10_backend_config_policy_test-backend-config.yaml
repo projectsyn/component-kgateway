@@ -1,0 +1,12 @@
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: test-backend-config
+  namespace: demo
+spec:
+  circuitBreakers:
+    maxConnections: 100
+  targetRefs:
+    - group: ''
+      kind: Service
+      name: nginx

@@ -2,6 +2,16 @@
 
 The parent key for all of the following parameters is `kgateway`.
 
+[NOTE]
+====
+The resource parameters (`gateways`, `reference_grants`, `gateway_parameters`, `listener_policies`, `backend_config_policies`, `gateway_extensions`, `traffic_policies`) all follow the same pattern:
+
+* Dictionary keys are used as `metadata.name`
+* Resources are created in the component's namespace by default (via ArgoCD), overridable via `metadata.namespace`
+* Values are processed using https://syn.tools/commodore/reference/commodore-libjsonnet.html#_generateresourcesresources_resourcefn[`com.generateResources()`], which supports deep-merging and setting values to `null` for removal
+====
+
+
 == `namespace`
 
 [horizontal]
@@ -11,9 +21,350 @@ default:: `syn-kgateway`
 The namespace in which to deploy this component.
 
 
-== Example
+== `namespace_labels`
 
+[horizontal]
+type:: dictionary
+default:: `{}`
+
+Additional labels to add to the component's namespace.
+
+
+== `namespace_annotations`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+
+Additional annotations to add to the component's namespace.
+
+
+== `gateway_api.enabled`
+
+[horizontal]
+type:: bool
+default:: `true`
+
+Whether to install Gateway API CRDs.
+Disable this if Gateway API CRDs are managed by another component or installed separately.
+
+
+== `gateway_api.channel`
+
+[horizontal]
+type:: string
+default:: `experimental`
+
+The Gateway API release channel to install.
+See https://gateway-api.sigs.k8s.io/guides/#install-standard-channel[Gateway API installation guide] for available channels.
+
+
+== `gateway_api.version`
+
+[horizontal]
+type:: string
+default:: `v1.4.0`
+
+The Gateway API CRD version to install.
+
+
+== `charts`
+
+[horizontal]
+type:: dictionary
+default:: See https://github.com/projectsyn/component-kgateway/blob/main/class/defaults.yml[`class/defaults.yml`]
+
+The Helm chart sources and versions for the kgateway CRDs and controller.
+
+
+== `gateways`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+example::
++
 [source,yaml]
 ----
-namespace: example-namespace
+gateways:
+  my-gateway: <1>
+    metadata: <2>
+      namespace: custom-ns
+    spec: <3>
+      gatewayClassName: kgateway
+      listeners:
+        - name: https
+          port: 443
+          protocol: HTTPS
+          hostname: "*.example.com"
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - name: wildcard-tls
+                namespace: cert-ns
+          allowedRoutes:
+            namespaces:
+              from: Selector
+              selector:
+                matchLabels:
+                  gateway-access: "true"
+      infrastructure:
+        parametersRef:
+          group: gateway.kgateway.dev
+          kind: GatewayParameters
+          name: my-gateway-params
 ----
+<1> The key is used as `metadata.name` of the Gateway resource.
+<2> The metadata of the resource (optional). Use `namespace` to override the default namespace.
+<3> The spec of the resource (required).
+
+Defines https://gateway-api.sigs.k8s.io/api-types/gateway/[Gateway] resources.
+Each Gateway creates an Envoy proxy deployment and a Service (typically LoadBalancer) that serves as an ingress entry point.
+Reference a GatewayParameters resource via `spec.infrastructure.parametersRef` to control the proxy infrastructure.
+
+
+== `reference_grants`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+example::
++
+[source,yaml]
+----
+reference_grants:
+  allow-tls-secrets: <1>
+    metadata: ... <2>
+    spec: <3>
+      from:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          namespace: syn-kgateway
+      to:
+        - group: ""
+          kind: Secret
+----
+<1> The key is used as `metadata.name` of the ReferenceGrant resource.
+<2> The metadata of the resource (optional).
+<3> The spec of the resource (required).
+
+Defines https://gateway-api.sigs.k8s.io/api-types/referencegrant/[ReferenceGrant] resources.
+These are a Gateway API security mechanism that explicitly allows cross-namespace references.
+Without a ReferenceGrant, a Gateway can't reference Secrets or Services in other namespaces.
+
+
+== `gateway_parameters`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+example::
++
+[source,yaml]
+----
+gateway_parameters:
+  my-gateway-params: <1>
+    metadata: ... <2>
+    spec: <3>
+      kube:
+        deployment:
+          replicas: 2
+        envoyContainer:
+          resources:
+            requests:
+              cpu: 500m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+          bootstrap:
+            logLevel: info
+        service:
+          type: LoadBalancer
+          externalTrafficPolicy: Local
+        stats:
+          enabled: true
+----
+<1> The key is used as `metadata.name` of the GatewayParameters resource.
+<2> The metadata of the resource (optional).
+<3> The spec of the resource (required).
+
+Defines GatewayParameters resources.
+Controls the infrastructure provisioned for a Gateway: replicas, resource limits, scheduling constraints, security context, and service configuration.
+Referenced from a Gateway via `spec.infrastructure.parametersRef`.
+See the https://kgateway.dev/docs/envoy/latest/reference/api/#gatewayparameters[GatewayParameters API reference] for available fields.
+
+
+== `listener_policies`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+example::
++
+[source,yaml]
+----
+listener_policies:
+  my-listener-policy: <1>
+    metadata: ... <2>
+    spec: <3>
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: my-gateway
+      default:
+        httpSettings:
+          useRemoteAddress: true
+          xffNumTrustedHops: 1
+          accessLog:
+            - fileSink:
+                path: /dev/stdout
+                jsonFormat:
+                  start_time: "%START_TIME%"
+                  method: "%REQ(:METHOD)%"
+                  path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+                  response_code: "%RESPONSE_CODE%"
+----
+<1> The key is used as `metadata.name` of the ListenerPolicy resource.
+<2> The metadata of the resource (optional).
+<3> The spec of the resource (required).
+
+Defines ListenerPolicy resources.
+Configures listener-level behavior on a Gateway: access logging, proxy protocol, connection timeouts, and HTTP settings.
+Attached to a Gateway via `spec.targetRefs`.
+See the https://kgateway.dev/docs/envoy/latest/reference/api/#listenerpolicy[ListenerPolicy API reference] for available fields.
+
+
+== `backend_config_policies`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+example::
++
+[source,yaml]
+----
+backend_config_policies:
+  default-backend-config: <1>
+    metadata: <2>
+      namespace: demo
+    spec: <3>
+      targetRefs:
+        - group: ""
+          kind: Service
+          name: my-service
+      connectTimeout: 5s
+      circuitBreakers:
+        maxConnections: 1024
+        maxPendingRequests: 1024
+        maxRequests: 1024
+        maxRetries: 3
+----
+<1> The key is used as `metadata.name` of the BackendConfigPolicy resource.
+<2> The metadata of the resource (optional). Must be in the same namespace as the target Service.
+<3> The spec of the resource (required).
+
+Defines BackendConfigPolicy resources.
+Configures upstream behavior for Services: circuit breaking, health checks, connect timeouts, outlier detection, load balancing, and TLS origination.
+Attached to a Service via `spec.targetRefs`.
+See the https://kgateway.dev/docs/envoy/latest/reference/api/#backendconfigpolicy[BackendConfigPolicy API reference] for available fields.
+
+
+== `gateway_extensions`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+example::
++
+[source,yaml]
+----
+gateway_extensions:
+  ext-auth: <1>
+    metadata: ... <2>
+    spec: <3>
+      extAuth:
+        grpcService:
+          backendRef:
+            name: ext-auth-service
+            port: 9091
+        failOpen: false
+----
+<1> The key is used as `metadata.name` of the GatewayExtension resource.
+<2> The metadata of the resource (optional).
+<3> The spec of the resource (required).
+
+Defines GatewayExtension resources.
+Declares reusable extension services (external auth, external processing, JWT, rate limiting) that can be referenced by TrafficPolicies.
+Unlike policy resources, GatewayExtensions don't attach to a target -- they're referenced from other resources.
+See the https://kgateway.dev/docs/envoy/latest/reference/api/#gatewayextension[GatewayExtension API reference] for available fields.
+
+
+== `traffic_policies`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+example::
++
+[source,yaml]
+----
+traffic_policies:
+  rate-limit-api: <1>
+    metadata: <2>
+      namespace: demo
+    spec: <3>
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          name: api-route
+      rateLimit:
+        local:
+          tokenBucket:
+            maxTokens: 100
+            tokensPerFill: 10
+            fillInterval: 1s
+----
+<1> The key is used as `metadata.name` of the TrafficPolicy resource.
+<2> The metadata of the resource (optional). Must be in the same namespace as the target HTTPRoute.
+<3> The spec of the resource (required).
+
+Defines TrafficPolicy resources.
+Configures request-level behavior on HTTPRoutes or Gateways: rate limiting, authentication, CORS, retries, timeouts, and header manipulation.
+Attached via `spec.targetRefs`.
+See the https://kgateway.dev/docs/envoy/latest/reference/api/#trafficpolicy[TrafficPolicy API reference] for available fields.
+
+
+== `rbac.aggregated_cluster_reader`
+
+[horizontal]
+type:: bool
+default:: `true`
+
+Whether to create ClusterRoles aggregated to `cluster-reader` that grant read access to kgateway CRDs (and Gateway API CRDs when `gateway_api.enabled` is `true`).
+
+
+== `helm_values_crds`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+
+Helm values to pass to the kgateway-crds Helm chart.
+
+
+== `helm_values`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+helm_values:
+  controller:
+    extraEnv:
+      KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES: true
+----
+
+Helm values to pass to the kgateway Helm chart.
+See the https://github.com/kgateway-dev/kgateway/blob/main/install/helm/kgateway/values.yaml[upstream `values.yaml`] for available options.

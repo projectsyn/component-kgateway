@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-cluster-reader: 'true'
+  name: gateway-api-crds-cluster-reader
+rules:
+  - apiGroups:
+      - gateway.networking.k8s.io
+    resources:
+      - '*'
+    verbs:
+      - get
+      - list
+      - watch

@@ -1,0 +1,10 @@
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: test-extension
+spec:
+  extAuth:
+    grpcService:
+      backendRef:
+        name: ext-auth-service
+        port: 9091

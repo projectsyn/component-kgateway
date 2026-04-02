@@ -1,5 +1,19 @@
 parameters:
   kapitan:
+    dependencies:
+      - type: https
+        source: ${kgateway:gateway_api:source}
+        output_path: ${_base_directory}/manifests/gateway-api/install.yaml
+      - type: helm
+        source: ${kgateway:charts:kgateway-crds:source}
+        version: ${kgateway:charts:kgateway-crds:version}
+        chart_name: kgateway-crds
+        output_path: ${_base_directory}/helmcharts/kgateway-crds/${kgateway:charts:kgateway-crds:version}
+      - type: helm
+        source: ${kgateway:charts:kgateway:source}
+        version: ${kgateway:charts:kgateway:version}
+        chart_name: kgateway
+        output_path: ${_base_directory}/helmcharts/kgateway/${kgateway:charts:kgateway:version}
     compile:
       - input_paths:
           - ${_base_directory}/component/app.jsonnet
@@ -7,5 +21,24 @@ parameters:
         output_path: .
       - input_paths:
           - ${_base_directory}/component/main.jsonnet
+          - ${_base_directory}/component/gateway-api-crds.jsonnet
         input_type: jsonnet
         output_path: kgateway/
+      # kgateway CRDs Helm chart
+      - input_paths:
+          - ${_base_directory}/helmcharts/kgateway-crds/${kgateway:charts:kgateway-crds:version}
+        input_type: helm
+        helm_values: ${kgateway:helm_values_crds}
+        helm_params:
+          name: kgateway-crds
+          namespace: ${kgateway:namespace}
+        output_path: kgateway/02_kgateway_crds
+      # kgateway Helm chart
+      - input_paths:
+          - ${_base_directory}/helmcharts/kgateway/${kgateway:charts:kgateway:version}
+        input_type: helm
+        helm_values: ${kgateway:helm_values}
+        helm_params:
+          name: kgateway
+          namespace: ${kgateway:namespace}
+        output_path: kgateway/03_kgateway

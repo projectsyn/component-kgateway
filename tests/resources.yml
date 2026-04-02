@@ -1,0 +1,91 @@
+parameters:
+  kgateway:
+    gateways:
+      test-gateway:
+        metadata:
+          namespace: syn-kgateway
+        spec:
+          gatewayClassName: kgateway
+          infrastructure:
+            parametersRef:
+              group: gateway.kgateway.dev
+              kind: GatewayParameters
+              name: test-params
+          listeners:
+            - name: http
+              port: 8080
+              protocol: HTTP
+              allowedRoutes:
+                namespaces:
+                  from: All
+    reference_grants:
+      allow-secret-access:
+        spec:
+          from:
+            - group: gateway.networking.k8s.io
+              kind: Gateway
+              namespace: syn-kgateway
+          to:
+            - group: ""
+              kind: Secret
+    gateway_parameters:
+      test-params:
+        spec:
+          kube:
+            deployment:
+              replicas: 2
+    listener_policies:
+      test-listener-policy:
+        spec:
+          targetRefs:
+            - group: gateway.networking.k8s.io
+              kind: Gateway
+              name: test-gateway
+          default:
+            httpSettings:
+              accessLog:
+                - fileSink:
+                    path: /dev/stdout
+                    jsonFormat:
+                      start_time: "%START_TIME%"
+                      method: "%REQ(:METHOD)%"
+                      path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+                      protocol: "%PROTOCOL%"
+                      response_code: "%RESPONSE_CODE%"
+                      duration: "%DURATION%"
+                      upstream_host: "%UPSTREAM_HOST%"
+                      client_address: "%DOWNSTREAM_REMOTE_ADDRESS%"
+    backend_config_policies:
+      test-backend-config:
+        metadata:
+          namespace: demo
+        spec:
+          targetRefs:
+            - group: ""
+              kind: Service
+              name: nginx
+          circuitBreakers:
+            maxConnections: 100
+    gateway_extensions:
+      test-extension:
+        spec:
+          extAuth:
+            grpcService:
+              backendRef:
+                name: ext-auth-service
+                port: 9091
+    traffic_policies:
+      test-traffic-policy:
+        metadata:
+          namespace: demo
+        spec:
+          targetRefs:
+            - group: gateway.networking.k8s.io
+              kind: HTTPRoute
+              name: nginx-route
+          rateLimit:
+            local:
+              tokenBucket:
+                maxTokens: 100
+                tokensPerFill: 10
+                fillInterval: 1s
