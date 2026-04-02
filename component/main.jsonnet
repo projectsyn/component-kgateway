@@ -2,6 +2,7 @@
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
+local lib = import 'lib/kgateway.libsonnet';
 local inv = kap.inventory();
 // The hiera parameters for the component
 local params = inv.parameters.kgateway;
@@ -17,17 +18,20 @@ local aggregatedClusterRole = {
   },
   rules: [
     {
-      apiGroups: ['gateway.networking.k8s.io'],
-      resources: ['*'],
-      verbs: ['get', 'list', 'watch'],
-    },
-    {
-      apiGroups: ['gateway.kgateway.dev'],
+      apiGroups: [lib.kgatewayApiGroup],
       resources: ['*'],
       verbs: ['get', 'list', 'watch'],
     },
   ],
 };
+
+local gateways = com.generateResources(params.gateways, lib.Gateway);
+local referenceGrants = com.generateResources(params.reference_grants, lib.ReferenceGrant);
+local gatewayParameters = com.generateResources(params.gateway_parameters, lib.GatewayParameters);
+local listenerPolicies = com.generateResources(params.listener_policies, lib.ListenerPolicy);
+local backendConfigPolicies = com.generateResources(params.backend_config_policies, lib.BackendConfigPolicy);
+local gatewayExtensions = com.generateResources(params.gateway_extensions, lib.GatewayExtension);
+local trafficPolicies = com.generateResources(params.traffic_policies, lib.TrafficPolicy);
 
 // Define outputs below
 {
@@ -40,73 +44,24 @@ local aggregatedClusterRole = {
   [if params.rbac.aggregated_cluster_reader then '10_cluster_role']:
     aggregatedClusterRole,
 } + {
-  ['10_gateway_%s' % name]: {
-    apiVersion: 'gateway.networking.k8s.io/v1',
-    kind: 'Gateway',
-    metadata+: {
-      name: name,
-      namespace: params.namespace,
-    },
-  } + com.makeMergeable(params.gateways[name])
-  for name in std.objectFields(params.gateways)
+  ['10_gateway_%s' % res.metadata.name]: res
+  for res in gateways
 } + {
-  ['10_reference_grant_%s' % name]: {
-    apiVersion: 'gateway.networking.k8s.io/v1beta1',
-    kind: 'ReferenceGrant',
-    metadata+: {
-      name: name,
-      namespace: params.namespace,
-    },
-  } + com.makeMergeable(params.reference_grants[name])
-  for name in std.objectFields(params.reference_grants)
+  ['10_reference_grant_%s' % res.metadata.name]: res
+  for res in referenceGrants
 } + {
-  ['10_gateway_parameters_%s' % name]: {
-    apiVersion: 'gateway.kgateway.dev/v1alpha1',
-    kind: 'GatewayParameters',
-    metadata+: {
-      name: name,
-      namespace: params.namespace,
-    },
-  } + com.makeMergeable(params.gateway_parameters[name])
-  for name in std.objectFields(params.gateway_parameters)
+  ['10_gateway_parameters_%s' % res.metadata.name]: res
+  for res in gatewayParameters
 } + {
-  ['10_listener_policy_%s' % name]: {
-    apiVersion: 'gateway.kgateway.dev/v1alpha1',
-    kind: 'ListenerPolicy',
-    metadata+: {
-      name: name,
-      namespace: params.namespace,
-    },
-  } + com.makeMergeable(params.listener_policies[name])
-  for name in std.objectFields(params.listener_policies)
+  ['10_listener_policy_%s' % res.metadata.name]: res
+  for res in listenerPolicies
 } + {
-  ['10_backend_config_policy_%s' % name]: {
-    apiVersion: 'gateway.kgateway.dev/v1alpha1',
-    kind: 'BackendConfigPolicy',
-    metadata+: {
-      name: name,
-      namespace: params.namespace,
-    },
-  } + com.makeMergeable(params.backend_config_policies[name])
-  for name in std.objectFields(params.backend_config_policies)
+  ['10_backend_config_policy_%s' % res.metadata.name]: res
+  for res in backendConfigPolicies
 } + {
-  ['10_gateway_extension_%s' % name]: {
-    apiVersion: 'gateway.kgateway.dev/v1alpha1',
-    kind: 'GatewayExtension',
-    metadata+: {
-      name: name,
-      namespace: params.namespace,
-    },
-  } + com.makeMergeable(params.gateway_extensions[name])
-  for name in std.objectFields(params.gateway_extensions)
+  ['10_gateway_extension_%s' % res.metadata.name]: res
+  for res in gatewayExtensions
 } + {
-  ['10_traffic_policy_%s' % name]: {
-    apiVersion: 'gateway.kgateway.dev/v1alpha1',
-    kind: 'TrafficPolicy',
-    metadata+: {
-      name: name,
-      namespace: params.namespace,
-    },
-  } + com.makeMergeable(params.traffic_policies[name])
-  for name in std.objectFields(params.traffic_policies)
+  ['10_traffic_policy_%s' % res.metadata.name]: res
+  for res in trafficPolicies
 }

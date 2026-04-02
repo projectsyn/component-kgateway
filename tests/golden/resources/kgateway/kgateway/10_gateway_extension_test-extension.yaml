@@ -2,7 +2,6 @@ apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
 metadata:
   name: test-extension
-  namespace: syn-kgateway
 spec:
   extAuth:
     grpcService:

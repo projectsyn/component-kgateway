@@ -3,10 +3,10 @@ kind: ClusterRole
 metadata:
   labels:
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: 'true'
-  name: kgateway-crds-cluster-reader
+  name: gateway-api-crds-cluster-reader
 rules:
   - apiGroups:
-      - gateway.kgateway.dev
+      - gateway.networking.k8s.io
     resources:
       - '*'
     verbs:

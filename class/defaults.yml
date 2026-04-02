@@ -5,8 +5,10 @@ parameters:
     namespace: syn-kgateway
 
     gateway_api:
+      enabled: true
       channel: experimental
       version: v1.4.0
+      source: https://github.com/kubernetes-sigs/gateway-api/releases/download/${kgateway:gateway_api:version}/${kgateway:gateway_api:channel}-install.yaml
 
     charts:
       kgateway-crds:
@@ -32,9 +34,8 @@ parameters:
     gateway_extensions: {}
     traffic_policies: {}
 
-    # Aggregated RBAC for CRD visibility
     rbac:
-      # ClusterRole aggregated to cluster-reader for Gateway API + kgateway CRDs
+      # Whether to aggregate read permissions for Gateway API + kgateway CRDs to the `cluster-reader` cluster role
       aggregated_cluster_reader: true
 
     helm_values_crds: {}

@@ -8,7 +8,7 @@
       "slug": "kgateway",
       "parameter_key": "kgateway",
       "test_cases": "defaults resources",
-      "add_lib": "n",
+      "add_lib": "y",
       "add_pp": "n",
       "add_golden": "y",
       "add_matrix": "y",

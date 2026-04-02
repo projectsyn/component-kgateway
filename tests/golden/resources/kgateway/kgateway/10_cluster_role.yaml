@@ -6,14 +6,6 @@ metadata:
   name: kgateway-crds-cluster-reader
 rules:
   - apiGroups:
-      - gateway.networking.k8s.io
-    resources:
-      - '*'
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
       - gateway.kgateway.dev
     resources:
       - '*'
