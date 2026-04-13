@@ -13,10 +13,10 @@ parameters:
     charts:
       kgateway-crds:
         source: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
-        version: v2.2.2
+        version: v2.2.3
       kgateway:
         source: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
-        version: v2.2.2
+        version: v2.2.3
 
     namespace_labels: {}
     namespace_annotations: {}
