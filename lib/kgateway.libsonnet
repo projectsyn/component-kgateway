@@ -61,6 +61,14 @@ local TrafficPolicy(name='') = {
   },
 };
 
+local HTTPRoute(name='') = {
+  apiVersion: '%s/v1' % gatewayApiGroup,
+  kind: 'HTTPRoute',
+  metadata: {
+    name: name,
+  },
+};
+
 {
   Gateway: Gateway,
   ReferenceGrant: ReferenceGrant,
@@ -69,6 +77,7 @@ local TrafficPolicy(name='') = {
   BackendConfigPolicy: BackendConfigPolicy,
   GatewayExtension: GatewayExtension,
   TrafficPolicy: TrafficPolicy,
+  HTTPRoute: HTTPRoute,
 
   gatewayApiGroup: gatewayApiGroup,
   kgatewayApiGroup: kgatewayApiGroup,

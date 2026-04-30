@@ -32,6 +32,7 @@ local listenerPolicies = com.generateResources(params.listener_policies, lib.Lis
 local backendConfigPolicies = com.generateResources(params.backend_config_policies, lib.BackendConfigPolicy);
 local gatewayExtensions = com.generateResources(params.gateway_extensions, lib.GatewayExtension);
 local trafficPolicies = com.generateResources(params.traffic_policies, lib.TrafficPolicy);
+local httpRoutes = com.generateResources(params.http_routes, lib.HTTPRoute);
 
 // Define outputs below
 {
@@ -64,4 +65,7 @@ local trafficPolicies = com.generateResources(params.traffic_policies, lib.Traff
 } + {
   ['10_traffic_policy_%s' % res.metadata.name]: res
   for res in trafficPolicies
+} + {
+  ['10_http_route_%s' % res.metadata.name]: res
+  for res in httpRoutes
 }

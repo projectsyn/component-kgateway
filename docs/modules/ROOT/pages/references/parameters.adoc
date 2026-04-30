@@ -4,7 +4,7 @@ The parent key for all of the following parameters is `kgateway`.
 
 [NOTE]
 ====
-The resource parameters (`gateways`, `reference_grants`, `gateway_parameters`, `listener_policies`, `backend_config_policies`, `gateway_extensions`, `traffic_policies`) all follow the same pattern:
+The resource parameters (`gateways`, `reference_grants`, `gateway_parameters`, `listener_policies`, `backend_config_policies`, `gateway_extensions`, `traffic_policies`, `http_routes`) all follow the same pattern:
 
 * Dictionary keys are used as `metadata.name`
 * Resources are created in the component's namespace by default (via ArgoCD), overridable via `metadata.namespace`
@@ -332,6 +332,36 @@ Defines TrafficPolicy resources.
 Configures request-level behavior on HTTPRoutes or Gateways: rate limiting, authentication, CORS, retries, timeouts, and header manipulation.
 Attached via `spec.targetRefs`.
 See the https://kgateway.dev/docs/envoy/latest/reference/api/#trafficpolicy[TrafficPolicy API reference] for available fields.
+
+
+== `http_routes`
+
+[horizontal]
+type:: dictionary
+default:: `{}`
+example::
++
+[source,yaml]
+----
+http_routes:
+  http-to-https-redirect: <1>
+    spec: <2>
+      parentRefs:
+        - name: my-gateway
+          kind: Gateway
+      rules:
+        - filters:
+            - type: RequestRedirect
+              requestRedirect:
+                scheme: https
+                statusCode: 301
+----
+<1> The key is used as `metadata.name` of the HTTPRoute resource.
+<2> The spec of the resource (required).
+
+Defines https://gateway-api.sigs.k8s.io/api-types/httproute/[HTTPRoute] resources.
+HTTPRoutes attach to a Gateway listener and define routing rules for HTTP traffic: path matching, header matching, request redirects, URL rewrites, and backend forwarding.
+A common use case is deploying an HTTP-to-HTTPS redirect route alongside a Gateway.
 
 
 == `rbac.aggregated_cluster_reader`
