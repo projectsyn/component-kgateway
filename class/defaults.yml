@@ -21,10 +21,9 @@ parameters:
     namespace_labels: {}
     namespace_annotations: {}
 
-    # Configurable Gateway resources (cluster admin defines these)
-    gateways: {}
-
     # Gateway API resources
+    gateways: {}
+    http_routes: {}
     reference_grants: {}
 
     # kgateway-specific resources
