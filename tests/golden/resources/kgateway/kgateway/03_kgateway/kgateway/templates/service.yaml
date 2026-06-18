@@ -6,8 +6,8 @@ metadata:
     app.kubernetes.io/instance: kgateway
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kgateway
-    app.kubernetes.io/version: 2.3.3
-    helm.sh/chart: kgateway-2.3.3
+    app.kubernetes.io/version: 2.3.4
+    helm.sh/chart: kgateway-2.3.4
     kgateway: kgateway
   name: kgateway
   namespace: syn-kgateway
