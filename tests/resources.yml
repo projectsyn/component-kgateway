@@ -1,4 +1,12 @@
+applications:
+  - gateway-api
+
 parameters:
+  kapitan:
+    dependencies:
+      - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-gateway-api/initial-implementation/lib/gateway-api.libsonnet
+        output_path: vendor/lib/gateway-api.libsonnet
   kgateway:
     gateways:
       test-gateway:

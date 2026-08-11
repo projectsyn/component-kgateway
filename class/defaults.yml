@@ -4,12 +4,6 @@ parameters:
       multi_tenant: true
     namespace: syn-kgateway
 
-    gateway_api:
-      enabled: true
-      channel: experimental
-      version: v1.4.0
-      source: https://github.com/kubernetes-sigs/gateway-api/releases/download/${kgateway:gateway_api:version}/${kgateway:gateway_api:channel}-install.yaml
-
     charts:
       kgateway-crds:
         source: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
