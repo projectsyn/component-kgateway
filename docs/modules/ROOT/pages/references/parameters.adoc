@@ -341,7 +341,9 @@ A common use case is deploying an HTTP-to-HTTPS redirect route alongside a Gatew
 type:: bool
 default:: `true`
 
-Whether to create ClusterRoles aggregated to `cluster-reader` that grant read access to kgateway CRDs and Gateway API CRDs.
+Whether to create a ClusterRole aggregated to `cluster-reader` that grants read access to the kgateway CRDs.
+
+NOTE: The aggregated ClusterRole for the upstream Gateway API CRDs is managed by https://github.com/projectsyn/component-gateway-api[component-gateway-api].
 
 
 == `helm_values_crds`

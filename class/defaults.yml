@@ -28,7 +28,7 @@ parameters:
     traffic_policies: {}
 
     rbac:
-      # Whether to aggregate read permissions for Gateway API + kgateway CRDs to the `cluster-reader` cluster role
+      # Whether to aggregate read permissions for the kgateway CRDs to the `cluster-reader` cluster role
       aggregated_cluster_reader: true
 
     helm_values_crds: {}
