@@ -1,9 +1,6 @@
 parameters:
   kapitan:
     dependencies:
-      - type: https
-        source: ${kgateway:gateway_api:source}
-        output_path: ${_base_directory}/manifests/gateway-api/install.yaml
       - type: helm
         source: ${kgateway:charts:kgateway-crds:source}
         version: ${kgateway:charts:kgateway-crds:version}
@@ -21,7 +18,6 @@ parameters:
         output_path: .
       - input_paths:
           - ${_base_directory}/component/main.jsonnet
-          - ${_base_directory}/component/gateway-api-crds.jsonnet
         input_type: jsonnet
         output_path: kgateway/
       # kgateway CRDs Helm chart

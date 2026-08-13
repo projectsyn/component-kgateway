@@ -39,35 +39,6 @@ default:: `{}`
 Additional annotations to add to the component's namespace.
 
 
-== `gateway_api.enabled`
-
-[horizontal]
-type:: bool
-default:: `true`
-
-Whether to install Gateway API CRDs.
-Disable this if Gateway API CRDs are managed by another component or installed separately.
-
-
-== `gateway_api.channel`
-
-[horizontal]
-type:: string
-default:: `experimental`
-
-The Gateway API release channel to install.
-See https://gateway-api.sigs.k8s.io/guides/#install-standard-channel[Gateway API installation guide] for available channels.
-
-
-== `gateway_api.version`
-
-[horizontal]
-type:: string
-default:: `v1.4.0`
-
-The Gateway API CRD version to install.
-
-
 == `charts`
 
 [horizontal]
@@ -370,7 +341,9 @@ A common use case is deploying an HTTP-to-HTTPS redirect route alongside a Gatew
 type:: bool
 default:: `true`
 
-Whether to create ClusterRoles aggregated to `cluster-reader` that grant read access to kgateway CRDs (and Gateway API CRDs when `gateway_api.enabled` is `true`).
+Whether to create a ClusterRole aggregated to `cluster-reader` that grants read access to the kgateway CRDs.
+
+NOTE: The aggregated ClusterRole for the upstream Gateway API CRDs is managed by https://github.com/projectsyn/component-gateway-api[component-gateway-api].
 
 
 == `helm_values_crds`

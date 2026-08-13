@@ -1,8 +1,8 @@
 // main template for kgateway
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
-local kube = import 'lib/kube.libjsonnet';
 local lib = import 'lib/kgateway.libsonnet';
+local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 // The hiera parameters for the component
 local params = inv.parameters.kgateway;
@@ -18,9 +18,9 @@ local aggregatedClusterRole = {
   },
   rules: [
     {
-      apiGroups: [lib.kgatewayApiGroup],
-      resources: ['*'],
-      verbs: ['get', 'list', 'watch'],
+      apiGroups: [ lib.kgatewayApiGroup ],
+      resources: [ '*' ],
+      verbs: [ 'get', 'list', 'watch' ],
     },
   ],
 };

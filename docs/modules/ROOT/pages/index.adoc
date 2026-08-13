@@ -2,4 +2,13 @@
 
 kgateway is a Commodore component to manage kgateway.
 
+[NOTE]
+====
+This component requires https://github.com/projectsyn/component-gateway-api[component-gateway-api] to be present in the cluster's `applications`.
+That component installs the upstream Gateway API CRDs and provides the component library which this component uses to generate Gateway API resources such as `Gateway`, `HTTPRoute` and `ReferenceGrant`.
+
+Ensure that the deployed kgateway version and its enabled features are compatible with the Gateway API channel and version configured for component-gateway-api on the cluster.
+For example, experimental Gateway API features (`KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`) require the `experimental` channel.
+====
+
 See the xref:references/parameters.adoc[parameters] reference for further details.

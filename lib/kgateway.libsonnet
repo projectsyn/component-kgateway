@@ -2,24 +2,16 @@
  * Library with public helper methods provided by component kgateway.
  */
 
-local gatewayApiGroup = 'gateway.networking.k8s.io';
+local kap = import 'lib/kapitan.libjsonnet';
+local inv = kap.inventory();
+
+local gw =
+  if std.member(inv.applications, 'gateway-api') then
+    import 'lib/gateway-api.libsonnet'
+  else
+    error 'Application "gateway-api" is required for the Gateway API helpers provided by lib/kgateway.libsonnet';
+
 local kgatewayApiGroup = 'gateway.kgateway.dev';
-
-local Gateway(name='') = {
-  apiVersion: '%s/v1' % gatewayApiGroup,
-  kind: 'Gateway',
-  metadata: {
-    name: name,
-  },
-};
-
-local ReferenceGrant(name='') = {
-  apiVersion: '%s/v1beta1' % gatewayApiGroup,
-  kind: 'ReferenceGrant',
-  metadata: {
-    name: name,
-  },
-};
 
 local GatewayParameters(name='') = {
   apiVersion: '%s/v1alpha1' % kgatewayApiGroup,
@@ -61,24 +53,18 @@ local TrafficPolicy(name='') = {
   },
 };
 
-local HTTPRoute(name='') = {
-  apiVersion: '%s/v1' % gatewayApiGroup,
-  kind: 'HTTPRoute',
-  metadata: {
-    name: name,
-  },
-};
-
 {
-  Gateway: Gateway,
-  ReferenceGrant: ReferenceGrant,
+  Gateway: gw.Gateway,
+  HTTPRoute: gw.HTTPRoute,
+  ReferenceGrant: gw.ReferenceGrant,
+
   GatewayParameters: GatewayParameters,
   ListenerPolicy: ListenerPolicy,
   BackendConfigPolicy: BackendConfigPolicy,
   GatewayExtension: GatewayExtension,
   TrafficPolicy: TrafficPolicy,
-  HTTPRoute: HTTPRoute,
 
-  gatewayApiGroup: gatewayApiGroup,
+  gatewayApiGroup: gw.gatewayApiGroup,
+  gatewayApiExperimentalGroup: gw.gatewayApiExperimentalGroup,
   kgatewayApiGroup: kgatewayApiGroup,
 }

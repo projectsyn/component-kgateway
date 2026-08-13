@@ -6,8 +6,8 @@ metadata:
     app.kubernetes.io/instance: kgateway
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kgateway
-    app.kubernetes.io/version: 2.3.6
-    helm.sh/chart: kgateway-2.3.6
+    app.kubernetes.io/version: 2.4.2
+    helm.sh/chart: kgateway-2.4.2
     kgateway: kgateway
   name: kgateway
   namespace: syn-kgateway
@@ -44,6 +44,8 @@ spec:
                   resource: limits.cpu
             - name: KGW_LOG_LEVEL
               value: info
+            - name: KGW_ADMIN_BIND_ADDRESS
+              value: localhost
             - name: KGW_XDS_SERVICE_NAME
               value: kgateway
             - name: KGW_XDS_SERVICE_PORT
@@ -51,7 +53,7 @@ spec:
             - name: KGW_DEFAULT_IMAGE_REGISTRY
               value: cr.kgateway.dev/kgateway-dev
             - name: KGW_DEFAULT_IMAGE_TAG
-              value: v2.3.6
+              value: v2.4.2
             - name: KGW_DEFAULT_IMAGE_PULL_POLICY
               value: IfNotPresent
             - name: KGW_DISCOVERY_NAMESPACE_SELECTORS
@@ -62,9 +64,11 @@ spec:
               value: '{}'
             - name: KGW_VALIDATION_MODE
               value: standard
+            - name: KGW_ENABLE_AWS_EC2_DISCOVERY
+              value: 'false'
+            - name: KGW_AWS_EC2_REFRESH_INTERVAL
+              value: 30s
             - name: KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES
-              value: 'true'
-            - name: KGW_ENABLE_ENVOY
               value: 'true'
             - name: KGW_GATEWAY_CLASS_PARAMETERS_REFS
               value: '{}'
@@ -72,7 +76,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-          image: cr.kgateway.dev/kgateway-dev/kgateway:v2.3.6
+          image: cr.kgateway.dev/kgateway-dev/kgateway:v2.4.2
           imagePullPolicy: IfNotPresent
           name: controller
           ports:
