@@ -971,6 +971,7 @@ spec:
                                       the next back off computation. It should be
                                       greater than zero and less than or equal to
                                       max_interval.
+                                    maxLength: 32
                                     type: string
                                     x-kubernetes-validations:
                                       - message: invalid duration value
@@ -980,6 +981,7 @@ spec:
                                       retries. This parameter is optional, but must
                                       be greater than or equal to the base_interval
                                       if set. The default is 10 times the base_interval.
+                                    maxLength: 32
                                     type: string
                                     x-kubernetes-validations:
                                       - message: invalid duration value
@@ -998,6 +1000,7 @@ spec:
                           timeout:
                             description: The timeout for the gRPC request. This is
                               the timeout for a specific request
+                            maxLength: 32
                             type: string
                             x-kubernetes-validations:
                               - message: invalid duration value
@@ -1208,6 +1211,7 @@ spec:
                                           for the next back off computation. It should
                                           be greater than zero and less than or equal
                                           to max_interval.
+                                        maxLength: 32
                                         type: string
                                         x-kubernetes-validations:
                                           - message: invalid duration value
@@ -1218,6 +1222,7 @@ spec:
                                           but must be greater than or equal to the
                                           base_interval if set. The default is 10
                                           times the base_interval.
+                                        maxLength: 32
                                         type: string
                                         x-kubernetes-validations:
                                           - message: invalid duration value
@@ -1237,6 +1242,7 @@ spec:
                               timeout:
                                 description: The timeout for the gRPC request. This
                                   is the timeout for a specific request
+                                maxLength: 32
                                 type: string
                                 x-kubernetes-validations:
                                   - message: invalid duration value
@@ -1567,6 +1573,7 @@ spec:
                   description: |-
                     IdleTimeout is the idle timeout for connections.
                     See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions
+                  maxLength: 32
                   type: string
                   x-kubernetes-validations:
                     - message: invalid duration value
@@ -2671,6 +2678,7 @@ spec:
                   description: |-
                     StreamIdleTimeout is the idle timeout for HTTP streams.
                     See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout
+                  maxLength: 32
                   type: string
                   x-kubernetes-validations:
                     - message: invalid duration value
@@ -3063,6 +3071,7 @@ spec:
                                             for the next back off computation. It
                                             should be greater than zero and less than
                                             or equal to max_interval.
+                                          maxLength: 32
                                           type: string
                                           x-kubernetes-validations:
                                             - message: invalid duration value
@@ -3073,6 +3082,7 @@ spec:
                                             but must be greater than or equal to the
                                             base_interval if set. The default is 10
                                             times the base_interval.
+                                          maxLength: 32
                                           type: string
                                           x-kubernetes-validations:
                                             - message: invalid duration value
@@ -3092,6 +3102,7 @@ spec:
                                 timeout:
                                   description: The timeout for the gRPC request. This
                                     is the timeout for a specific request
+                                  maxLength: 32
                                   type: string
                                   x-kubernetes-validations:
                                     - message: invalid duration value
