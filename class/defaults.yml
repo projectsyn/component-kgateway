@@ -7,10 +7,10 @@ parameters:
     charts:
       kgateway-crds:
         source: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
-        version: 2.4.3
+        version: v2.4.4
       kgateway:
         source: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
-        version: 2.4.3
+        version: v2.4.4
 
     namespace_labels: {}
     namespace_annotations: {}
